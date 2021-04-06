@@ -8,7 +8,7 @@ import (
 func main() {
 	// TODO: create a input over here
 	//stringInput := "(1+(4+5+2)-3)+(6+8)"
-	stringInput := "(1+1+2)"
+	stringInput := "(123+2)"
 	result := calculate(stringInput)
 	fmt.Println(result)
 }
@@ -71,7 +71,20 @@ func calculate(expression string) int {
 		}
 
 		if !isClosingParenthesis(incomingValue) {
-			calculatorStack = append(calculatorStack, incomingValue)
+			if isNumber(incomingValue) {
+				TOSCalculatorStack := len(calculatorStack) - 1
+				TOSIsNumber := isNumber(calculatorStack[TOSCalculatorStack])
+				if TOSIsNumber {
+					TOSValue, _ := strconv.Atoi(calculatorStack[TOSCalculatorStack])
+					TOSValue *= 10
+					incomingValueInInt, _ := strconv.Atoi(incomingValue)
+					calculatorStack[TOSCalculatorStack] = strconv.Itoa(TOSValue + incomingValueInInt)
+				} else {
+					calculatorStack = append(calculatorStack, incomingValue)
+				}
+			} else {
+				calculatorStack = append(calculatorStack, incomingValue)
+			}
 			continue
 		}
 
