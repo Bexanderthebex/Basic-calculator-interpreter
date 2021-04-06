@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 func main() {
 	// TODO: create a input over here
-	stringInput := "(123+(2+3)+2)"
+	stringInput := "(1+(4+5+2)-3)+(6+8)"
 	result := calculate(stringInput)
 	fmt.Println(result)
 }
@@ -32,7 +33,7 @@ func evaluate(expressionStack []string) int {
 					incomingValue, _ := strconv.Atoi(s)
 					presentValue, _ := strconv.Atoi(subExpressionStack[TOS-2])
 					// pop it
-					total = incomingValue + -presentValue
+					total = -incomingValue + presentValue
 				}
 
 				subExpressionStack[0] = strconv.Itoa(total)
@@ -47,10 +48,14 @@ func evaluate(expressionStack []string) int {
 }
 
 func calculate(expression string) int {
+	if string(expression[0]) != "(" {
+		expression = "(" + expression + ")"
+	}
+
 	calculatorStack := make([]string, 0, len(expression))
 	var currentExpressionStart int
 	var currentTotal int
-	for _, s := range expression {
+	for index, s := range expression {
 		incomingValue := string(s)
 		if isWhiteSpace(incomingValue) {
 			continue
@@ -86,8 +91,13 @@ func calculate(expression string) int {
 			calculatorStack[currentExpressionStart] = strconv.Itoa(subExpressionValue)
 			calculatorStack = calculatorStack[0 : currentExpressionStart+1]
 			currentExpressionStart = 0
+			if index == len(expression)-1 && len(calculatorStack) > 1 {
+				currentTotal = calculate(strings.Join(calculatorStack, ""))
+			}
+
 			continue
 		}
+
 	}
 
 	return currentTotal
