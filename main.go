@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// TODO: create a input over here
-	stringInput := "1"
+	stringInput := "(5-(1+(5)))"
 	result := calculate(stringInput)
 	fmt.Println(result)
 }
@@ -55,9 +55,7 @@ func evaluate(expressionStack []string) int {
 }
 
 func calculate(expression string) int {
-	if string(expression[0]) != "(" {
-		expression = "(" + expression + ")"
-	}
+	expression = "(" + expression + ")"
 
 	calculatorStack := make([]string, 0, len(expression))
 	var currentExpressionStart int
@@ -72,10 +70,21 @@ func calculate(expression string) int {
 			currentExpressionStart = len(calculatorStack)
 		}
 
+		if isSubtraction(incomingValue) {
+			TOS := len(calculatorStack) - 1
+			TOSValue := calculatorStack[TOS]
+			isTOSNumber := isNumber(TOSValue)
+			if !isTOSNumber {
+				calculatorStack = append(calculatorStack, "0", incomingValue)
+				continue
+			}
+		}
+
 		if !isClosingParenthesis(incomingValue) {
 			if isNumber(incomingValue) {
 				TOSCalculatorStack := len(calculatorStack) - 1
 				TOSIsNumber := isNumber(calculatorStack[TOSCalculatorStack])
+
 				if TOSIsNumber {
 					TOSValue, _ := strconv.Atoi(calculatorStack[TOSCalculatorStack])
 					TOSValue *= 10
@@ -93,11 +102,19 @@ func calculate(expression string) int {
 		if isClosingParenthesis(incomingValue) {
 			calculatorStack = append(calculatorStack, incomingValue)
 
+			for i := 0; i <= len(calculatorStack)-1; i++ {
+				if isOpeningParenthesis(calculatorStack[i]) {
+					currentExpressionStart = i
+					continue
+				}
+			}
+
 			subExpressionValue := evaluate(calculatorStack[currentExpressionStart:])
 			currentTotal = subExpressionValue
 			calculatorStack[currentExpressionStart] = strconv.Itoa(subExpressionValue)
 			calculatorStack = calculatorStack[0 : currentExpressionStart+1]
-			currentExpressionStart = 0
+
+			//currentExpressionStart = 0
 			if index == len(expression)-1 && len(calculatorStack) > 1 {
 				currentTotal = calculate(strings.Join(calculatorStack, ""))
 			}
