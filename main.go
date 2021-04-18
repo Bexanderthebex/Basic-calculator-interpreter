@@ -6,9 +6,11 @@ import (
 	"strings"
 )
 
+// TODO: change the algorihtm
+
 func main() {
 	// TODO: create a input over here
-	stringInput := "(1+(4+5+2)-3)+(6+8)"
+	stringInput := "1"
 	result := calculate(stringInput)
 	fmt.Println(result)
 }
@@ -42,6 +44,11 @@ func evaluate(expressionStack []string) int {
 				continue
 			}
 		}
+	}
+
+	if len(subExpressionStack) == 1 {
+		value, _ := strconv.Atoi(subExpressionStack[0])
+		return value
 	}
 
 	return total
